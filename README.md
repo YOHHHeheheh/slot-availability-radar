@@ -8,9 +8,4 @@ An intelligent browser automation agent designed to monitor appointment and book
 - **Session Persistence:** Saves authenticated cookies (`session_state.json`) to prevent repeated manual logins.
 - **Human-in-the-Loop Safety:** Halts completely at the OTP and payment gateway to ensure zero automated financial risk.
 
-## 🛠️ Quickstart
 
-### 1. Install Dependencies
-```bash
-pip install -r requirements.txt
-playwright install chromium
