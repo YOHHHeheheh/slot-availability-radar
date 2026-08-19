@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="RailYatra — Book Indian train tickets with ease. Search trains, compare prices, and book seats or apply for waiting list.">
+  <title>RailYatra — Train Seat Booking Portal</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Station dropdown styles */
+    .station-input-wrapper {
+      position: relative;
+    }
+    .station-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: 240px;
+      overflow-y: auto;
+      background: rgba(243, 233, 220, 0.97);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(192, 133, 82, 0.25);
+      border-top: none;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      box-shadow: 0 8px 24px rgba(94, 48, 35, 0.15);
+      z-index: 100;
+    }
+    .station-dropdown.visible { display: block; }
+    .station-option {
+      padding: 10px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.15s;
+      border-bottom: 1px solid rgba(192, 133, 82, 0.08);
+    }
+    .station-option:hover {
+      background: rgba(192, 133, 82, 0.12);
+    }
+    .station-opt-code {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--amber);
+      min-width: 45px;
+      letter-spacing: 0.04em;
+    }
+    .station-opt-name {
+      font-size: 0.88rem;
+      color: var(--deep-brown);
+      flex: 1;
+    }
+    .station-opt-city {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* Swap button */
+    .swap-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid rgba(192, 133, 82, 0.3);
+      background: rgba(243, 233, 220, 0.6);
+      color: var(--amber);
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+      margin-top: 20px;
+    }
+    .swap-btn:hover {
+      background: var(--amber);
+      color: var(--cream);
+      transform: rotate(180deg);
+    }
+
+    /* Station row layout */
+    .station-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .station-row .form-group { flex: 1; }
+
+    /* Form section spacing */
+    .form-section {
+      margin-bottom: 28px;
+    }
+    .form-section:last-child { margin-bottom: 0; }
+
+    /* Options row */
+    .options-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    /* Heritage banner text */
+    .heritage-text {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.82rem;
+      color: rgba(243, 233, 220, 0.5);
+      font-style: italic;
+      letter-spacing: 0.03em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="main-navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-brand">
+        <span class="logo-icon">🚂</span>
+        RailYatra
+      </a>
+      <div class="wallet-badge">
+        <span class="coin-icon">🪙</span>
+        <span class="wallet-amount">5,000</span>
+        <span style="opacity:0.7;font-size:0.8rem;">RC</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <!-- Slideshow Background -->
+    <div class="hero-slideshow">
+      <div class="slide active" style="background-image: url('images/heritage-train.jpg')"></div>
+      <div class="slide" style="background-image: url('images/train-evolution.jpg')"></div>
+      <div class="slide" style="background-image: url('images/modern-train.jpg')"></div>
+    </div>
+    <div class="hero-overlay"></div>
+
+    <!-- Booking Form -->
+    <div class="hero-content">
+      <h1 class="hero-title">Book Your Journey Across India</h1>
+      <p class="hero-subtitle">From heritage routes to high-speed rail — your adventure begins here</p>
+
+      <form class="booking-form" id="booking-form" autocomplete="off">
+
+        <!-- Journey Details -->
+        <div class="form-section">
+          <h3 class="section-title"><span class="icon">📍</span> Journey Details</h3>
+
+          <div class="station-row">
+            <div class="form-group">
+              <label for="from-station">From Station</label>
+              <div class="station-input-wrapper">
+                <input type="text" id="from-station" class="form-control station-input" placeholder="Search city or station..." required>
+                <div class="station-dropdown"></div>
+              </div>
+            </div>
+
+            <button type="button" class="swap-btn" onclick="swapStations()" title="Swap stations">⇄</button>
+
+            <div class="form-group">
+              <label for="to-station">To Station</label>
+              <div class="station-input-wrapper">
+                <input type="text" id="to-station" class="form-control station-input" placeholder="Search city or station..." required>
+                <div class="station-dropdown"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="journey-date">Date of Journey</label>
+              <input type="date" id="journey-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="pref-time">Preferred Departure</label>
+              <select id="pref-time" class="form-control">
+                <option value="any">Any Time</option>
+                <option value="morning">Morning (6 AM – 12 PM)</option>
+                <option value="afternoon">Afternoon (12 PM – 5 PM)</option>
+                <option value="evening">Evening (5 PM – 9 PM)</option>
+                <option value="night">Night (9 PM – 6 AM)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="travel-class">Travel Class</label>
+              <select id="travel-class" class="form-control">
+                <option value="">All Classes</option>
+                <option value="SL">Sleeper (SL)</option>
+                <option value="3A">3rd AC (3A)</option>
+                <option value="2A">2nd AC (2A)</option>
+                <option value="1A">1st AC (1A)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Traveller Details -->
+        <div class="form-section">
+          <h3 class="section-title"><span class="icon">👤</span> Traveller Details</h3>
+
+          <div id="travellers-container">
+            <!-- Traveller 1 (default) -->
+            <div class="traveller-card" data-index="1">
+              <div class="traveller-header">
+                <span class="traveller-number">Traveller 1</span>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="name-1">Full Name</label>
+                  <input type="text" id="name-1" class="form-control traveller-name" placeholder="As on ID proof" required>
+                </div>
+                <div class="form-group">
+                  <label for="age-1">Age</label>
+                  <input type="number" id="age-1" class="form-control traveller-age" min="1" max="120" placeholder="Age" required>
+                </div>
+                <div class="form-group">
+                  <label for="gender-1">Gender</label>
+                  <select id="gender-1" class="form-control traveller-gender" required>
+                    <option value="">Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="id-type-1">ID Type</label>
+                  <select id="id-type-1" class="form-control traveller-id-type" required>
+                    <option value="">Select</option>
+                    <option value="Aadhaar">Aadhaar Card</option>
+                    <option value="Passport">Passport</option>
+                    <option value="PAN">PAN Card</option>
+                    <option value="VoterID">Voter ID</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="id-num-1">ID Number</label>
+                  <input type="text" id="id-num-1" class="form-control traveller-id-num" placeholder="ID Number" required>
+                </div>
+                <div class="form-group">
+                  <label for="berth-1">Berth Preference</label>
+                  <select id="berth-1" class="form-control traveller-berth">
+                    <option value="No Preference">No Preference</option>
+                    <option value="Lower">Lower</option>
+                    <option value="Middle">Middle</option>
+                    <option value="Upper">Upper</option>
+                    <option value="Side Lower">Side Lower</option>
+                    <option value="Side Upper">Side Upper</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="add-traveller-btn" id="add-traveller-btn">
+            + Add Another Traveller
+          </button>
+        </div>
+
+        <!-- Additional Options -->
+        <div class="form-section">
+          <h3 class="section-title"><span class="icon">⚙️</span> Additional Options</h3>
+          <div class="options-row">
+            <div class="toggle-wrapper">
+              <label class="toggle-switch">
+                <input type="checkbox" id="tatkal-toggle">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label">Tatkal Booking</span>
+            </div>
+            <div class="toggle-wrapper">
+              <label class="toggle-switch">
+                <input type="checkbox" id="senior-toggle">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label">Senior Citizen Concession</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">
+          🔍 Search Trains
+        </button>
+      </form>
+
+      <p class="heritage-text">Celebrating India's rail heritage — from the Fairy Queen (1855) to Vande Bharat</p>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
