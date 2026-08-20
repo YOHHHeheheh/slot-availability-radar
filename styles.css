@@ -60,6 +60,34 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
 }
+<head>
+  <!-- Your other head elements -->
+  <style>
+    nav {
+      display: flex;
+      justify-content: space-between; /* This pushes logo left and button right */
+      align-items: center;
+      padding: 15px 40px;
+    }
+
+    .btn-signin {
+      padding: 8px 20px;
+      border: 1px solid #7cb3be;
+      border-radius: 6px;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      background-color: transparent;
+      transition: all 0.3s ease;
+    }
+
+    .btn-signin:hover {
+      background-color: #7cb3be;
+      color: #1a3b47;
+    }
+  </style>
+</head>
 
 body {
   font-family: var(--font-body);
