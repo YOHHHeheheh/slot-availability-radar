@@ -1,6 +1,6 @@
-# Visa / Tatkal Slot Availability Radar
+# Train ticket Slot Availability Radar
 
-An intelligent browser automation agent designed to monitor appointment and booking portals for newly opened or cancelled slots, execute rapid autofill, and safely pause for human OTP verification.
+An intelligent browser automation agent designed using Webcmd to monitor appointment and booking portals for newly opened or cancelled slots, execute rapid autofill, and safely pause for human OTP verification.
 
 ## 🚀 Key Features
 - **API & XHR Network Interception:** Monitors background network responses directly to detect slot openings with sub-second latency.
