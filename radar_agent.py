@@ -1,188 +1,220 @@
-import json
-import os
-import random
 import sys
 import time
-import requests
-from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
+from datetime import datetime
+from playwright.sync_api import sync_playwright
 
-def load_config(path="config.json"):
-    with open(path, "r") as f:
-        return json.load(f)
+# Audio alarm trigger for CVV
+try:
+    import winsound
+    def trigger_beep_alarm():
+        for _ in range(5):
+            winsound.Beep(1200, 300)
+            time.sleep(0.1)
+except ImportError:
+    def trigger_beep_alarm():
+        for _ in range(5):
+            sys.stdout.write("\a")
+            sys.stdout.flush()
+            time.sleep(0.2)
 
-def send_telegram_alert(config, message):
-    """Dispatches a low-latency alert via Telegram webhook."""
-    notif = config.get("notifications", {})
-    if not notif.get("telegram_enabled"):
-        return
-    token = notif.get("bot_token")
-    chat_id = notif.get("chat_id")
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
-    try:
-        requests.post(url, json=payload, timeout=2)
-    except Exception as e:
-        print(f"[!] Notification dispatch error: {e}")
+def format_date(raw_date_str):
+    """Converts DD-MM-YYYY, DD/MM/YYYY, or YYYY-MM-DD into valid YYYY-MM-DD."""
+    clean_str = raw_date_str.strip().replace("/", "-")
+    for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d-%m-%y"):
+        try:
+            return datetime.strptime(clean_str, fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+    return raw_date_str
 
-def trigger_human_alarm():
-    """Triggers local terminal bells and visual banners for human-in-the-loop takeover."""
+def instant_select(page, selector, target_value):
+    """Instantly selects matching dropdown options via JavaScript with zero timeout delay."""
+    page.evaluate("""
+        ([sel, query]) => {
+            const dropdown = document.querySelector(sel);
+            if (!dropdown) return;
+            const options = Array.from(dropdown.options);
+            const match = options.find(opt => 
+                opt.value.toLowerCase().includes(query.toLowerCase()) || 
+                opt.text.toLowerCase().includes(query.toLowerCase())
+            );
+            if (match) {
+                dropdown.value = match.value;
+                dropdown.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+    """, [selector, target_value])
+
+def prompt_input(label, default=""):
+    val = input(f">> Enter {label} [{default}]: ").strip()
+    return val if val else default
+
+def get_terminal_inputs():
     print("\n" + "=" * 60)
-    print("🚨 SLOT SECURED! HUMAN ACTION REQUIRED AT PAYMENT/OTP 🚨")
+    print("📋 TRAIN BOOKING AGENT - FAST SETUP")
+    print("(Press ENTER directly to choose the bracketed default)")
+    print("=" * 60)
+
+    # 1. Journey Setup
+    print("\n[1] JOURNEY SETUP:")
+    from_stn = prompt_input("From Station", "Howrah Junction")
+    to_stn = prompt_input("To Station", "New Delhi")
+    raw_date = prompt_input("Journey Date (DD-MM-YYYY or YYYY-MM-DD)", "2026-10-09")
+    date_val = format_date(raw_date)
+
+    # 2. Passenger Setup
+    print("\n[2] PASSENGER SETUP:")
+    name = prompt_input("Passenger Name", "Trishit Roy")
+    age = prompt_input("Age", "19")
+
+    # Gender Menu
+    print("\nSelect Gender:")
+    print("  [1] Male")
+    print("  [2] Female")
+    print("  [3] Other")
+    gender_choice = prompt_input("Gender Option (1/2/3)", "1")
+    gender_map = {"1": "Male", "2": "Female", "3": "Other"}
+    selected_gender = gender_map.get(gender_choice, "Male")
+
+    # Identity Type Menu
+    print("\nSelect ID Type:")
+    print("  [1] Aadhaar Card")
+    print("  [2] Passport")
+    print("  [3] PAN Card")
+    print("  [4] Voter ID")
+    id_choice = prompt_input("ID Type Option (1/2/3/4)", "1")
+    id_map = {
+        "1": "Aadhaar",
+        "2": "Passport",
+        "3": "PAN",
+        "4": "Voter"
+    }
+    selected_id_type = id_map.get(id_choice, "Aadhaar")
+
+    id_num = prompt_input(f"Enter {selected_id_type} Number", "1234567821")
+
+    # 3. Card Setup
+    print("\n[3] PAYMENT CARD SETUP:")
+    card_no = prompt_input("Card Number", "1234 5678 1234 7879")
+    card_name = prompt_input("Cardholder Name", name)
+    exp = prompt_input("Expiry Date (MM/YY)", "09/27")
+
+    print("\n" + "=" * 60)
+    print(f"✅ Configured: {name} | {selected_gender} | {selected_id_type}")
+    print("🚀 Launching high-speed automation engine...")
     print("=" * 60 + "\n")
-    for _ in range(5):
-        sys.stdout.write("\a")
-        sys.stdout.flush()
-        time.sleep(0.25)
 
-def apply_stealth_overrides(page):
-    """Masks browser automation flags and standard fingerprint leaks."""
-    stealth_js = """
-    Object.defineProperty(navigator, 'webdriver', {
-        get: () => undefined,
-        configurable: true
-    });
-    window.chrome = {
-        runtime: {},
-        loadTimes: function() {},
-        csi: function() {},
-        app: {}
-    };
-    Object.defineProperty(navigator, 'languages', {
-        get: () => ['en-US', 'en']
-    });
-    """
-    page.add_init_script(stealth_js)
+    return {
+        "from": from_stn,
+        "to": to_stn,
+        "date": date_val,
+        "name": name,
+        "age": age,
+        "gender": selected_gender,
+        "id_type": selected_id_type,
+        "id_num": id_num,
+        "card_no": card_no,
+        "card_name": card_name,
+        "exp": exp
+    }
 
-def human_type(locator, text):
-    """Types characters with Gaussian-distributed micro-delays."""
-    locator.focus()
-    for char in text:
-        locator.type(char, delay=random.randint(45, 120))
-        if random.random() < 0.05:
-            time.sleep(random.uniform(0.1, 0.25))
-
-def run_radar():
-    config = load_config()
-    selectors = config["selectors"]
-    traveler = config["traveler"]
-    state_file = config["session_state_file"]
-    
-    current_backoff = config["poll_interval_seconds"]
-    slot_detected = False
-    latest_api_payload = {}
+def run():
+    data = get_terminal_inputs()
+    target_url = "https://yohhheheheh.github.io/slot-availability-radar/"
 
     with sync_playwright() as p:
-        # Configure residential proxy if enabled
-        launch_kwargs = {"headless": False, "args": ["--disable-blink-features=AutomationControlled"]}
-        if config["proxy"]["enabled"]:
-            launch_kwargs["proxy"] = {"server": config["proxy"]["server"]}
-
-        browser = p.chromium.launch(**launch_kwargs)
-
-        # Persistent session restoration
-        context_kwargs = {
-            "viewport": {"width": 1920, "height": 1080},
-            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
-        }
-        if os.path.exists(state_file):
-            print("[*] Hydrating authenticated session from existing state file...")
-            context_kwargs["storage_state"] = state_file
-
-        context = browser.new_context(**context_kwargs)
+        # Removed slow_mo to run at top performance
+        browser = p.chromium.launch(headless=False)
+        context = browser.new_context()
         page = context.new_page()
-        apply_stealth_overrides(page)
 
-        # API & XHR Interception Listener
-        def handle_network_response(response):
-            nonlocal slot_detected, latest_api_payload, current_backoff
-            # Adaptive rate-limit handling
-            if response.status == 429:
-                print("[!] Rate limit detected (HTTP 429). Initiating adaptive backoff...")
-                current_backoff = min(current_backoff * 2, config["max_backoff_seconds"])
-                return
+        print("[*] 1. Opening Booking Portal...")
+        page.goto(target_url, wait_until="domcontentloaded")
 
-            # Intercept availability payloads directly from background network traffic
-            if config["api_endpoint_keyword"] in response.url and response.status == 200:
-                current_backoff = config["poll_interval_seconds"]
-                try:
-                    data = response.json()
-                    latest_api_payload = data
-                    # Check for positive slot indicators in the JSON
-                    if data.get("available") is True or data.get("slots_count", 0) > 0:
-                        print(f"[+] Direct API Hit: Slot confirmed available! Data: {data}")
-                        slot_detected = True
-                except Exception:
-                    pass
+        # ---------------------------------------------------------
+        # STEP 1: Search Form
+        # ---------------------------------------------------------
+        print(f"[*] 2. Entering Origin: {data['from']}...")
+        from_box = page.get_by_role("textbox", name="From Station")
+        from_box.fill(data["from"])
+        try:
+            page.get_by_text(data["from"]).first.click(timeout=1000)
+        except Exception:
+            pass
 
-        page.on("response", handle_network_response)
+        print(f"[*] 3. Entering Destination: {data['to']}...")
+        to_box = page.get_by_role("textbox", name="To Station")
+        to_box.fill(data["to"])
+        try:
+            page.get_by_text(data["to"]).last.click(timeout=1000)
+        except Exception:
+            pass
 
-        print(f"[*] Navigating to: {config['target_url']}")
-        page.goto(config["target_url"], wait_until="domcontentloaded")
+        print(f"[*] 4. Setting Date: {data['date']}...")
+        page.locator("#journey-date, input[type='date']").first.fill(data["date"])
 
-        # Initial login & session checkpoint
-        if not os.path.exists(state_file):
-            print("[*] No saved session found. Complete manual login now.")
-            print("[*] Once logged in and on the booking screen, press ENTER to save session and start radar...")
-            input(">> ")
-            context.storage_state(path=state_file)
-            print(f"[+] Authenticated state persisted to {state_file}")
+        try:
+            page.locator(".toggle-slider").first.click(timeout=800)
+            page.locator("div:nth-child(2) > .toggle-switch > .toggle-slider").click(timeout=800)
+        except Exception:
+            pass
 
-        print("[*] Radar monitoring active. Listening to background API streams and DOM...")
-        attempt = 1
+        print("[*] 5. Searching Trains...")
+        page.get_by_role("button", name="🔍 Search Trains").click()
 
-        # Monitoring Loop
-        while not slot_detected:
-            attempt += 1
-            # Check DOM fallback alongside API interception
-            try:
-                dom_slot = page.locator(selectors["slot_button"]).first
-                if dom_slot.is_visible(timeout=1500):
-                    print("[+] Slot indicator observed in UI elements.")
-                    slot_detected = True
-                    break
-            except Exception:
-                pass
+        # ---------------------------------------------------------
+        # STEP 2: Select Train
+        # ---------------------------------------------------------
+        print("[*] 6. Booking Train Slot...")
+        book_btn = page.get_by_role("button", name="Book Seat").first
+        book_btn.wait_for(state="visible", timeout=8000)
+        book_btn.click()
 
-            # Heartbeat ping / periodic page refresh to prevent session idle timeout
-            if attempt % 6 == 0:
-                print("[*] Heartbeat: refreshing active session state...")
-                page.reload(wait_until="domcontentloaded")
-            
-            jittered_sleep = current_backoff + random.uniform(0.5, 1.8)
-            time.sleep(jittered_sleep)
+        # ---------------------------------------------------------
+        # STEP 3: Instant Passenger Details (Zero Lag)
+        # ---------------------------------------------------------
+        print(f"[*] 7. Filling Passenger Details for {data['name']}...")
+        name_input = page.get_by_role("textbox", name="Full Name")
+        name_input.wait_for(state="visible", timeout=8000)
+        name_input.fill(data["name"])
+        page.get_by_role("spinbutton", name="Age").fill(str(data["age"]))
 
-        # Slot Claim Execution
-        if slot_detected:
-            send_telegram_alert(config, "🚨 **Slot Found!** Auto-filling details and holding at payment screen.")
-            print("[*] Initiating rapid form completion...")
-            
-            try:
-                page.locator(selectors["slot_button"]).first.click()
-            except Exception:
-                pass
+        # Instant dropdown selections using direct DOM events
+        instant_select(page, "#pass-gender, select[name*='gender'], select[id*='gender'], select", data["gender"])
+        instant_select(page, "#pass-id-type, select[name*='id'], select[id*='id'], select:nth-of-type(2)", data["id_type"])
 
-            # Natural humanized typing injection
-            human_type(page.locator(selectors["name_input"]), traveler["full_name"])
-            human_type(page.locator(selectors["id_input"]), traveler["passport_or_id"])
-            
-            if page.locator(selectors["phone_input"]).is_visible():
-                human_type(page.locator(selectors["phone_input"]), traveler["phone"])
+        id_num_box = page.get_by_role("textbox", name="ID Number")
+        id_num_box.fill(data["id_num"])
 
-            # Proceed to authentication / payment checkpoint
-            page.locator(selectors["submit_button"]).click()
+        print("[*] 8. Proceeding to Payment...")
+        page.get_by_role("button", name="Proceed to Payment ➔").click()
 
-            # Human-in-the-Loop Hand-off
-            trigger_human_alarm()
-            try:
-                page.wait_for_selector(selectors["otp_payment_indicator"], timeout=8000)
-            except Exception:
-                pass
+        # ---------------------------------------------------------
+        # STEP 4: Card Details & CVV Halt
+        # ---------------------------------------------------------
+        print("[*] 9. Entering Card Details...")
+        card_box = page.get_by_role("textbox", name="Card Number")
+        card_box.wait_for(state="visible", timeout=8000)
+        card_box.fill(data["card_no"])
 
-            print("[*] Automation halted at security checkpoint. Complete OTP and payment manually.")
-            input(">> Press ENTER once payment is finished to clean up and exit: ")
+        page.get_by_role("textbox", name="Card Holder Name").fill(data["card_name"])
+        page.get_by_role("textbox", name="Expiry Date").fill(data["exp"])
 
+        # Focus CVV Box and Halt
+        cvv_box = page.get_by_role("textbox", name="CVV")
+        cvv_box.click()
+
+        print("\n" + "=" * 60)
+        print("🚨 BEEP ALARM TRIGGERED! BOT PAUSED AT CVV 🚨")
+        print("=" * 60)
+        print(">> Cursor is active inside the CVV input box.")
+        print(">> Type your CVV manually in the browser and click '💳 Pay Now'.")
+        print("=" * 60 + "\n")
+
+        trigger_beep_alarm()
+
+        input(">> Press ENTER in this terminal when finished to close: ")
         browser.close()
-        print("[*] Radar session closed cleanly.")
 
 if __name__ == "__main__":
-    run_radar()
+    run()
