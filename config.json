@@ -1,31 +1,23 @@
 {
-  "target_url": "https://example-booking-portal.com/dashboard",
-  "api_endpoint_keyword": "/api/v1/slots/availability",
-  "poll_interval_seconds": 5,
-  "max_backoff_seconds": 60,
-  "session_state_file": "session_state.json",
-  "proxy": {
-    "enabled": false,
-    "server": "http://user:password@proxy.residential.com:8080"
-  },
-  "notifications": {
-    "telegram_enabled": false,
-    "bot_token": "YOUR_TELEGRAM_BOT_TOKEN",
-    "chat_id": "YOUR_CHAT_ID"
+  "target_url": "https://yohhheheheh.github.io/slot-availability-radar/",
+  "journey": {
+    "from_station": "Howrah (HWH)",
+    "to_station": "New Jalpaiguri (NJP)",
+    "date": "2026-09-15",
+    "travel_class": "All Classes",
+    "quota": "General"
   },
   "traveler": {
-    "full_name": "Rahul Sharma",
-    "passport_or_id": "Z1234567",
-    "age": "24",
-    "phone": "9876543210",
-    "email": "rahul.sharma@example.com"
+    "full_name": "Trishit Roy",
+    "age": "19",
+    "gender": "Male",
+    "id_type": "Passport",
+    "id_number": "Z1234567",
+    "berth_preference": "No Preference"
   },
-  "selectors": {
-    "slot_button": "[data-testid='book-slot-btn'], .btn-available-slot",
-    "name_input": "input[name='fullName'], #applicant-name",
-    "id_input": "input[name='passportNumber'], #doc-id",
-    "phone_input": "input[name='mobileNumber'], #phone",
-    "submit_button": "button[type='submit'], #btn-proceed",
-    "otp_payment_indicator": "#otp-verification, .payment-gateway-wrapper"
+  "payment": {
+    "card_number": "1234 5678 1234 7879",
+    "card_holder": "Trishit Roy",
+    "expiry_date": "09/27"
   }
 }
