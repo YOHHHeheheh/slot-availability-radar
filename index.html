@@ -12,6 +12,33 @@
   <link rel="icon" type="image/png" href="https://cdn.phototourl.com/free/2026-08-19-76118bb4-a28d-4fdc-ba7e-831e129bc135.png" />
   <link rel="stylesheet" href="styles.css">
   <style>
+    /* Navbar layout */
+.navbar {
+  display: flex;
+  justify-content: space-between; /* Pushes logo left, button right */
+  align-items: center;
+  padding: 15px 40px;
+  background-color: transparent; /* Adjust color to match your current header shade */
+  width: 100%;
+}
+
+/* Sign In Button styling matching UI scheme */
+.btn-signin {
+  padding: 8px 20px;
+  border: 1px solid #7cb3be; /* Theme accent color */
+  border-radius: 6px;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+/* Hover Effect */
+.btn-signin:hover {
+  background-color: #7cb3be;
+  color: #1a3b47;
+}
     /* Station dropdown styles */
     .station-input-wrapper {
       position: relative;
