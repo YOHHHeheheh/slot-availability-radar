@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RailYatra — Train Seat Booking Portal</title>
+  
+  <!-- Add your favicon here -->
+  <link rel="icon" type="image/png" href="https://cdn.phototourl.com/free/2026-08-19-76118bb4-a28d-4fdc-ba7e-831e129bc135.png" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="RailYatra — Secure payment gateway. Complete your train booking with RailCoins token currency.">
+  <title>Payment — RailYatra</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar scrolled" id="main-navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-brand" title="RailYatra - Futuristic Journey Solutions">
+        <img src="https://cdn.phototourl.com/free/2026-08-19-053d87a8-767c-47d0-b0b3-64b555b55510.png" alt="RailYatra - Futuristic Journey Solutions" class="main-brand-logo">
+      </a>
+      <div class="navbar-right">
+        <div class="navbar-datetime" id="navbar-datetime"></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+    <div class="container">
+      <a href="trains.html" class="back-link">← Back to Trains</a>
+
+      <h1 style="font-family: var(--font-heading); font-size: 2rem; margin-bottom: 32px; color: var(--deep-brown);">
+        Complete Your Booking
+      </h1>
+
+      <div class="payment-grid">
+
+        <!-- Left: Booking Summary -->
+        <div>
+          <div class="booking-summary-card">
+            <h2>🎫 Booking Summary</h2>
+
+            <div class="summary-row">
+              <span class="label">Train</span>
+              <span class="value" id="pay-train-name">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="label">Route</span>
+              <span class="value" id="pay-route">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="label">Date</span>
+              <span class="value" id="pay-date">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="label">Departure</span>
+              <span class="value" id="pay-departure">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="label">Arrival</span>
+              <span class="value" id="pay-arrival">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="label">Duration</span>
+              <span class="value" id="pay-duration">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="label">Class</span>
+              <span class="value" id="pay-class">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="label">Booking Type</span>
+              <span class="value" id="pay-type">—</span>
+            </div>
+
+            <hr style="border: none; height: 1px; background: rgba(192,133,82,0.15); margin: 16px 0;">
+
+            <h3 style="font-size: 0.9rem; font-weight: 700; color: var(--medium-brown); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">
+              Travellers
+            </h3>
+            <div id="pay-traveller-list" class="traveller-list-summary">
+              <!-- Filled by JS -->
+            </div>
+
+            <div class="summary-total">
+              <div>
+                <div class="total-label">Total Amount</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">
+                  <span id="pay-per-person">—</span> × <span id="pay-traveller-count">—</span>
+                </div>
+              </div>
+              <div class="total-value" id="pay-total">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Wallet + Payment Form -->
+        <div>
+          <div class="payment-form-card">
+            <h2>💳 Payment Details</h2>
+
+            <!-- Card Preview -->
+            <div class="credit-card-preview">
+              <div class="card-chip"></div>
+              <div class="card-number-display" id="card-number-display">•••• •••• •••• ••••</div>
+              <div class="card-bottom">
+                <div class="card-holder-display">
+                  Card Holder
+                  <span id="card-holder-name">YOUR NAME</span>
+                </div>
+                <div class="card-expiry-display">
+                  Expires
+                  <span id="card-expiry-date">MM/YY</span>
+                </div>
+              </div>
+            </div>
+
+            <form id="payment-form">
+              <div class="form-group">
+                <label for="card-number">Card Number</label>
+                <input type="text" id="card-number" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" required>
+              </div>
+              <div class="form-group">
+                <label for="card-holder">Card Holder Name</label>
+                <input type="text" id="card-holder" class="form-control" placeholder="Name on card" required>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="card-expiry">Expiry Date</label>
+                  <input type="text" id="card-expiry" class="form-control" placeholder="MM/YY" maxlength="5" required>
+                </div>
+                <div class="form-group">
+                  <label for="card-cvv">CVV</label>
+                  <input type="password" id="card-cvv" class="form-control" placeholder="•••" maxlength="4" required>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top: 8px;">
+                💳 Pay Now
+              </button>
+
+              <p style="text-align:center; margin-top:12px; font-size:0.8rem; color:var(--text-muted);">
+                🔒 Secured by RailYatra Payment Gateway
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    function updateNavbarDateTime() {
+      const now = new Date();
+      const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+      const dateStr = now.toLocaleDateString('en-IN', options);
+      const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      const el = document.getElementById('navbar-datetime');
+      if (el) el.textContent = dateStr + '  \u2022  ' + timeStr;
+    }
+    updateNavbarDateTime();
+    setInterval(updateNavbarDateTime, 1000);
+  </script>
+</body>
+</html>

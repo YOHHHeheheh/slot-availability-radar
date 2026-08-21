@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 160" width="100%" height="100%">
+  <defs>
+    <!-- Ribbon Loop Gradient -->
+    <linearGradient id="ribbonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="25%" stop-color="#7000ff"/>
+      <stop offset="50%" stop-color="#ff007a"/>
+      <stop offset="75%" stop-color="#ff6b00"/>
+      <stop offset="100%" stop-color="#ffc700"/>
+    </linearGradient>
+
+    <!-- Rail Text Gradient (Cyan / Blue) -->
+    <linearGradient id="railGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+
+    <!-- Yatra Text Gradient (Pink / Coral) -->
+    <linearGradient id="yatraGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="50%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#fb7185"/>
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g transform="translate(10, 10)">
+    <!-- CIRCULAR TRAIN LOGO ICON -->
+    <g transform="translate(0, 0)">
+      <!-- Outer Glow Circle Track -->
+      <circle cx="70" cy="70" r="64" fill="none" stroke="url(#ribbonGrad)" stroke-width="8" stroke-linecap="round" opacity="0.95"/>
+      
+      <!-- Futuristic Train Silhouette & Ribbon Lines inside circle -->
+      <!-- Train streamlined nose & roof -->
+      <path d="M 28,45 C 55,45 85,45 105,52 C 122,58 132,74 130,88 C 127,102 110,118 85,118 C 65,118 45,108 35,95 C 25,82 20,60 42,50 C 60,42 80,48 92,62 C 102,74 100,90 88,98 C 76,105 60,102 52,90 C 45,80 50,68 62,65 C 75,62 88,72 88,85" 
+            fill="none" stroke="url(#ribbonGrad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      
+      <!-- Windshield / cockpit loop -->
+      <path d="M 98,58 C 114,64 118,74 114,84 C 110,92 98,96 82,96" 
+            fill="none" stroke="url(#ribbonGrad)" stroke-width="5" stroke-linecap="round" opacity="0.9"/>
+      
+      <!-- Under-carriage line -->
+      <path d="M 32,88 C 45,105 70,122 100,112" 
+            fill="none" stroke="url(#ribbonGrad)" stroke-width="6" stroke-linecap="round"/>
+    </g>
+
+    <!-- BRAND TYPOGRAPHY -->
+    <g transform="translate(160, 15)">
+      <!-- "Rail" text -->
+      <text x="0" y="72" font-family="'Inter', 'Montserrat', 'Segoe UI', system-ui, sans-serif" font-size="70" font-weight="800" fill="url(#railGrad)" letter-spacing="-1.5">Rail<tspan fill="url(#yatraGrad)">Yatra</tspan></text>
+      
+      <!-- Subtitle: "FUTURISTIC JOURNEY SOLUTIONS" -->
+      <text x="4" y="112" font-family="'Inter', 'Montserrat', 'Segoe UI', system-ui, sans-serif" font-size="16.5" font-weight="600" fill="#ffffff" letter-spacing="5.5" opacity="0.95">FUTURISTIC JOURNEY SOLUTIONS</text>
+    </g>
+  </g>
+</svg>

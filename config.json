@@ -1,0 +1,23 @@
+{
+  "target_url": "https://yohhheheheh.github.io/slot-availability-radar/",
+  "journey": {
+    "from_station": "Howrah (HWH)",
+    "to_station": "New Jalpaiguri (NJP)",
+    "date": "2026-09-15",
+    "travel_class": "All Classes",
+    "quota": "General"
+  },
+  "traveler": {
+    "full_name": "Trishit Roy",
+    "age": "19",
+    "gender": "Male",
+    "id_type": "Passport",
+    "id_number": "Z1234567",
+    "berth_preference": "No Preference"
+  },
+  "payment": {
+    "card_number": "1234 5678 1234 7879",
+    "card_holder": "Trishit Roy",
+    "expiry_date": "09/27"
+  }
+}
